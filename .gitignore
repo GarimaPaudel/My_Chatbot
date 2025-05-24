@@ -1,0 +1,115 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.python-version
+.env/
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
+/.ipynb
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+*.notebooks/
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# FastAPI Swagger JSON or OpenAPI generation
+openapi.json
+
+# Docker
+*.env
+.env.*
+docker-compose.override.yml
+
+# Database files
+*.sqlite3
+*.db
+*.sql
+
+
+
+
+
+# Local dev data
+*.local
+
+# Optional: compiled files (e.g., protobuf)
+*.pb.go
+*.pb.cc
+*.pb.h
+
+# Optional: systemd service unit and logs
+*.service
+*.log
+
+.ipynb_checkpoints
+notebooks/
+
+# Alembic migration environment cache
+alembic/__pycache__/
+alembic/versions/__pycache__/
+
+# If you want to ignore all migration scripts (optional)
+# Uncomment the next line if you don't want to track migration history
+# alembic/versions/
+
+# Alembic-generated SQLite (if you're using for testing/dev)
+*.db
+*.sqlite3
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Env files
+.env
+.env.*
+
+# General Python
+*.log
+*.egg-info/
+*.egg
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
