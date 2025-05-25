@@ -1,8 +1,9 @@
 from app.services.vectorstore import QdrantVectorStoreDB
+from app.services.documents import DocumentTextExtractor
 from qdrant_client import QdrantClient
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from app.utils import settings
-
+from app.utils import clean_text
 
 class ProjectPipeline:
     """
@@ -20,6 +21,7 @@ class ProjectPipeline:
         self.vectorstore = QdrantVectorStoreDB(
             qdrant_client=self.qdrant_client, vector_embedding=self.vector_embeddings
         )
+        self.add_documents = DocumentTextExtractor()
 
     async def create_collection(self, collection_name: str):
         """
@@ -34,4 +36,17 @@ class ProjectPipeline:
         """
         return await self.vectorstore.delete_collection(collection_name)
     
+    async def upload_documents(self, documents: list[dict], collection_name: str):
+        """
+        Upload documents to the chatbot
+        """
+        return await self.vectorstore.upload_documents(documents, collection_name)
     
+    def extract_text(self, file_path):
+        """
+        Extract text from the given file path.
+        """
+        text = self.add_documents.extract_text(file_path)
+        return clean_text(text)
+    
+

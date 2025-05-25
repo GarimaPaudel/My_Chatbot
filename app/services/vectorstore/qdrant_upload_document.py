@@ -27,6 +27,7 @@ async def upload_document_existing_collection(
         retrieval_mode=RetrievalMode.DENSE,
         timeout=30000,
     )
+    return True
 
 
 async def answer_query_from_existing_collection(vector_embed, collection_name_):

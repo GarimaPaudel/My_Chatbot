@@ -5,7 +5,6 @@ from app.services.vectorstore.qdrant_upload_document import (
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 import logging as logger
-from qdrant_client.models import Filter, FieldCondition, MatchAny, FilterSelector
 
 
 class QdrantVectorStoreDB:
@@ -40,9 +39,8 @@ class QdrantVectorStoreDB:
             logger.error(f"Error deleting collection: {e}")
             raise e
 
-    async def upload_documents(self, documents: list[dict], bot_id: str):
+    async def upload_documents(self, documents: list[dict], collection_name: str):
         """Upload Documents to qdrant vectorstore"""
-
         try:
             splitter = RecursiveCharacterTextSplitter(
                 chunk_size=1500, chunk_overlap=150, add_start_index=True
@@ -53,29 +51,18 @@ class QdrantVectorStoreDB:
                 source = str(doc.get("file_name", ""))
                 final_t.append(Document(page_content=text, metadata={"source": source}))
             final_docs = splitter.split_documents(final_t)
-            await upload_document_existing_collection(
+            response = await upload_document_existing_collection(
                 documents_=final_docs,
                 vector_embeddings=self.vector_embedding,
-                collection_name_=bot_id,
+                collection_name_=collection_name,
             )
-            logger.info(f"Documents uploaded successfully to collection {bot_id}.")
+            if response:
+                logger.info(f"Documents uploaded successfully to collection {collection_name}.")
+                return response
+            else:
+                logger.error(f"Failed to upload documents to collection {collection_name}.")
+                return False  
+                #TODO: raise an exception (Custom)
         except Exception as e:
             logger.error(f"Error uploading documents: {e}")
-            raise e
-
-    async def delete_documents(self, collection_name: str, documents: list[str]):
-        """Delete all points where 'source' field in payload matches any of the given filenames."""  # noqa
-        try:
-            selector = FilterSelector(
-                filter=Filter(
-                    must=[
-                        FieldCondition(key="metadata.source", match=MatchAny(any=documents))
-                    ]
-                )
-            )
-            self.qdrant_client.delete(
-                collection_name=collection_name, points_selector=selector
-            )
-            return True
-        except Exception as e:
             raise e

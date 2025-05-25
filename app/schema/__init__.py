@@ -1,3 +1,7 @@
 from .chat_schemas import (
-    VectorStoreSchema
-)
+    VectorStoreSchema,
+    UploadDocumentSchema,
+    DocumentResponseSchema,
+    Message,
+    UploadDocumentsResponse
+    )

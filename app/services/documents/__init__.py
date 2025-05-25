@@ -1,0 +1,1 @@
+from .add_documents import DocumentTextExtractor
