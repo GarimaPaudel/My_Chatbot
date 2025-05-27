@@ -1,20 +1,24 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File
 from app.pipeline import ProjectPipeline
-from app.schema import (VectorStoreSchema, UploadDocumentSchema, UploadDocumentsResponse, DocumentResponseSchema)
+from app.schema import (VectorStoreSchema, UploadDocumentSchema, UploadDocumentsResponse, DocumentResponseSchema, ChatSchema)
 from fastapi import status
 import tempfile
 import os
 import uuid
+from app.agents.agent import agent
 
 pipeline = ProjectPipeline()
 router = APIRouter()
-@router.get("/chat")
-async def chat():
+@router.get("/chat", status_code=status.HTTP_200_OK)
+async def chat(
+    query: str,
+    session_id: str,
+    collection_name: str):
     """
     Endpoint to handle chat requests.
     """
     try:
-        response = {"message": "This is a placeholder response."}
+        response = await pipeline.answer_query(query, session_id, collection_name)
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -49,7 +53,6 @@ async def upload_documents(request: UploadDocumentSchema) -> UploadDocumentsResp
     """
     try:
         response = await pipeline.upload_documents(request.documents, request.collection_name)
-        print("-------------RESPONSE--------------:", response)
         if response:
             return UploadDocumentsResponse(
                 detail="Documents Uploaded Successfully"
@@ -90,3 +93,13 @@ async def extract_text(files: list[UploadFile] = File(...)) -> DocumentResponseS
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+
+
+@router.post("/chat_with_agent")
+async def chat_with_agent(user_message: str):
+    try:
+        response = agent.invoke(user_message)
+        return {"response": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

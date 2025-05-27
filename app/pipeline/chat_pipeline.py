@@ -4,6 +4,7 @@ from qdrant_client import QdrantClient
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from app.utils import settings
 from app.utils import clean_text
+from app.services.answer_query import AnswerQuery
 
 class ProjectPipeline:
     """
@@ -22,6 +23,7 @@ class ProjectPipeline:
             qdrant_client=self.qdrant_client, vector_embedding=self.vector_embeddings
         )
         self.add_documents = DocumentTextExtractor()
+        self.answer_queries = AnswerQuery()
 
     async def create_collection(self, collection_name: str):
         """
@@ -48,5 +50,11 @@ class ProjectPipeline:
         """
         text = self.add_documents.extract_text(file_path)
         return clean_text(text)
+    
+    async def answer_query(self, query: str, session_id: str, collection_name: str):
+        """
+        Answer a query using the chatbot.
+        """
+        return await self.answer_queries.in_memory_answer_query(query, session_id, collection_name)
     
 
