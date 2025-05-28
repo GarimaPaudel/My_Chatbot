@@ -113,3 +113,10 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Versions
+=*
+
+# Test files
+test.py
+test.ipynb

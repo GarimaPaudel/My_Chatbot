@@ -3,5 +3,7 @@ from .chat_schemas import (
     UploadDocumentSchema,
     DocumentResponseSchema,
     Message,
-    UploadDocumentsResponse
+    UploadDocumentsResponse,
+    AppointmentSchema,
+    ChatSchema
     )
