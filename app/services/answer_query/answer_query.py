@@ -6,7 +6,9 @@ from pydantic import BaseModel, Field
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import MessagesPlaceholder
-
+from langchain import hub
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from app.utils.config import settings
@@ -34,6 +36,14 @@ class AnswerQuery:
         self.embeddings = GoogleGenerativeAIEmbeddings(
             google_api_key=GOOGLE_API_KEY, model="models/text-embedding-004"
         )
+        self.model = ChatGroq(
+            model="llama-3.1-8b-instant",
+            temperature=0.7,
+            max_tokens=100,
+            streaming=True,
+            timeout=None,
+            max_retries=2,
+        )
         self.sessions = {}
 
     def get_by_session_id(self, session_id: str) -> BaseChatMessageHistory:
@@ -51,14 +61,7 @@ class AnswerQuery:
         """ "
         Chat with bot using In Memory Implementation.
         """
-        model = ChatGroq(
-            model="llama-3.1-8b-instant",
-            temperature=0.7,
-            max_tokens=100,
-            streaming=True,
-            timeout=None,
-            max_retries=2,
-        )
+
         # Vector store first!
         vector_store = await answer_query_from_existing_collection(
             collection_name_=collection_name,
@@ -89,7 +92,7 @@ class AnswerQuery:
     ]
 )
 
-        chain = prompt | model
+        chain = prompt | self.model
 
         with_message_history = RunnableWithMessageHistory(
             chain,
@@ -111,3 +114,39 @@ class AnswerQuery:
         async for chunk in response_stream:
             response_text += str(chunk.content) if hasattr(chunk, "content") else str(chunk)
         return {"response": response_text}
+    
+    async def answer_query_rag(self, query: str):
+        """
+        Function to make tool for answering queries using RAG (Retrieval-Augmented Generation).
+        """
+        collection_name = settings.RAG_COLLECTION_NAME
+        vector_store = await answer_query_from_existing_collection(
+            collection_name_=collection_name,
+            vector_embed=self.embeddings,
+        )
+
+        retriever = vector_store.as_retriever()
+
+        prompt = hub.pull("rlm/rag-prompt")
+        model = ChatGroq(
+            model="llama-3.1-8b-instant",
+            temperature=0.9,
+            max_tokens=100,
+            streaming=True,
+            timeout=None,
+            max_retries=2,
+        )
+
+        def format_docs(docs):
+            return "\n\n".join(doc.page_content for doc in docs)
+
+
+        rag_chain = (
+            {"context": retriever | format_docs, "question": RunnablePassthrough()}
+            | prompt
+            | model
+            | StrOutputParser()
+        )
+
+        return(rag_chain.invoke(query))
+

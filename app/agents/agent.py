@@ -1,44 +1,51 @@
-from langchain.agents import initialize_agent, AgentType
-from langchain.agents import AgentExecutor, create_tool_calling_agent, tool
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 from app.tools import TOOLS
 from langchain_groq import ChatGroq
-from langchain.agents import AgentExecutor, create_tool_calling_agent, tool
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_redis import RedisChatMessageHistory
+from app.utils.config import settings
+from langchain_core.prompts import ChatPromptTemplate
 
 
-model = ChatGroq(
-        model="llama-3.1-8b-instant",
-        temperature=0.9,
-        max_tokens=100,
-        streaming=True,
-        timeout=None,
-        max_retries=2,
-    )
 
-# agent = initialize_agent(
-#     tools=TOOLS,
-#     llm=model,
-#     agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
-#     verbose=True,
-# )
+class ChatbotAgent:
+    def __init__(self):
+        self.model = ChatGroq(
+            model="llama-3.1-8b-instant",
+            temperature=0.9,
+            max_tokens=100,
+            streaming=True,
+            timeout=None,
+            max_retries=2,
+        )
+        self.prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                "You are a helpful assistant. "
+                "You have two tools: "
+                "1. 'create_appointment_tool' for booking appointments, and "
+                "2. 'rag_response_tool' for answering questions from documents. "
+                "If the user wants to book an appointment, extract their name,email,phone and date from query and call booking tool to store in database. "
+                "If the user asks a question about documents, use the rag_response_tool. "
+                "Only call ONE tool ONCE per user question "
+                "and AVOID calling the same tool multiple times in a single response. "
+            ),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ])
+        self.agent = create_tool_calling_agent(self.model, TOOLS, self.prompt)
+        self.agent_executor = AgentExecutor(agent=self.agent, tools=TOOLS, verbose=True)
 
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+    @staticmethod
+    def get_redis_history(session_id: str):
+        return RedisChatMessageHistory(session_id=session_id, redis_url=settings.REDIS_URL)
 
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain_core.messages import SystemMessage, HumanMessage
+    def get_agent_with_chat_history(self):
+        return RunnableWithMessageHistory(
+            self.agent_executor,
+            self.get_redis_history,
+            input_messages_key="input",
+            history_messages_key="chat_history",
+        )
 
-# Your prompt must include the variables: "input" and "agent_scratchpad"
-prompt = ChatPromptTemplate.from_messages([
-    SystemMessage(content=(
-        "You are a helpful assistant. "
-        "You can answer questions from documents and help users book appointments. "
-        "If the user asks to book an appointment, collect their name, email, phone, and date step-by-step. "
-        "Do not call the create_appointment tool until you have all 4 fields."
-    )),
-    MessagesPlaceholder(variable_name="chat_history"),
-    HumanMessage(content="{input}"),
-    MessagesPlaceholder(variable_name="agent_scratchpad"),
-])
-
-agent = create_tool_calling_agent(llm=model, tools=TOOLS, prompt=prompt)
-agent_executor = AgentExecutor(agent=agent, tools=TOOLS, verbose=True)

@@ -5,10 +5,12 @@ from fastapi import status
 import tempfile
 import os
 import uuid
-from app.agents.agent import agent
+from app.agents.agent import  ChatbotAgent
 
 pipeline = ProjectPipeline()
 router = APIRouter()
+chatbot_agent = ChatbotAgent()
+
 @router.get("/chat", status_code=status.HTTP_200_OK)
 async def chat(
     query: str,
@@ -97,9 +99,12 @@ async def extract_text(files: list[UploadFile] = File(...)) -> DocumentResponseS
 
 
 @router.post("/chat_with_agent")
-async def chat_with_agent(user_message: str):
+async def chat_with_agent(user_message: str, session_id: str):
     try:
-        response = agent.invoke(user_message)
+        config = {"configurable": {"session_id": session_id}}
+        agent_with_chat_history = chatbot_agent.get_agent_with_chat_history()
+        response = await agent_with_chat_history.ainvoke({"input": user_message}, config)
         return {"response": response}
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

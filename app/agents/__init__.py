@@ -1,1 +1,1 @@
-from .agent import agent, agent_executor
+from .agent import  ChatbotAgent

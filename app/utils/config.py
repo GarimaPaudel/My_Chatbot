@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: str
     GROQ_API_KEY: str
     MONGODB_URI: str
+    RAG_COLLECTION_NAME: str
+    REDIS_URL: str
+
 
     model_config = SettingsConfigDict(
         env_file=".env",

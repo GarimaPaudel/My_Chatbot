@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
+from datetime import date
 
 class VectorStoreSchema(BaseModel):
     collection_name: str
@@ -29,3 +30,21 @@ class UploadDocumentsResponse(BaseModel):
 class DocumentResponseSchema(BaseModel):
     source_type: str
     results: list[DRS]
+
+
+# class AppointmentSchema(BaseModel):
+#     name: str
+#     email: EmailStr
+#     phone: str = Field(..., min_length=10, max_length=15)
+#     date: date
+
+class AppointmentSchema(BaseModel):
+    name: str
+    email: EmailStr
+    phone: str = Field(..., min_length=10, max_length=15)
+    date: str
+
+class ChatSchema(BaseModel):
+    query: str
+    session_id: str
+    collection_name: str
