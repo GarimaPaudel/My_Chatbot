@@ -15,7 +15,7 @@ env/
 ENV/
 .venv/
 .python-version
-.env/
+.env
 
 # VSCode
 .vscode/
@@ -52,7 +52,6 @@ openapi.json
 
 # Docker
 *.env
-.env.*
 docker-compose.override.yml
 
 # Database files
@@ -97,7 +96,6 @@ __pycache__/
 
 # Env files
 .env
-.env.*
 
 # General Python
 *.log
