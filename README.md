@@ -16,15 +16,10 @@ A powerful, extensible chatbot system built with **FastAPI**, **LangChain**, and
   - Phone
   - Preferred Date
 
-- 🧰 **LangChain Agents & Tools**  
-  Modular architecture allowing dynamic tool use and easy integration of new capabilities.
-
-- ⚡ **Streaming LLM Support**  
-  Fast, real-time responses powered by **Groq LLMs**.
 
 - 🧬 **MongoDB & Qdrant Integration**  
   - MongoDB: Stores appointment records.
-  - Qdrant: Stores document embeddings for semantic retrieval.
+  - Qdrant: Stores vector embeddings of uploaded documents.
 
 ---
 
