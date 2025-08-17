@@ -1,4 +1,4 @@
-# 🤖 Chatbot Task — Intelligent FastAPI Chatbot
+#  Chatbot  — Intelligent FastAPI Chatbot
 
 A powerful, extensible chatbot system built with **FastAPI**, **LangChain**, and **Groq LLMs** — featuring **Conversational Q&A**, **Appointment Booking**, and **Dynamic Tool Agents**.
 
@@ -6,10 +6,10 @@ A powerful, extensible chatbot system built with **FastAPI**, **LangChain**, and
 
 ## 🚀 Features
 
-- 🧠 **Conversational Q&A**  
+-  **Conversational Q&A**  
   Ask natural-language questions about your uploaded documents using RAG (Retrieval-Augmented Generation).
 
-- 📅 **Appointment Booking**  
+-  **Appointment Booking**  
   Seamlessly book appointments via a conversational form. Collects:
   - Name
   - Email
@@ -17,13 +17,13 @@ A powerful, extensible chatbot system built with **FastAPI**, **LangChain**, and
   - Preferred Date
 
 
-- 🧬 **MongoDB & Qdrant Integration**  
+-  **MongoDB & Qdrant Integration**  
   - MongoDB: Stores appointment records.
   - Qdrant: Stores vector embeddings of uploaded documents.
 
 ---
 
-## 🛠️ Setup Instructions
+##  Setup Instructions
 
 ### 1. Clone the Repository
 
@@ -47,23 +47,23 @@ python main.py
 ```
 
 ### 5. Docker Images
-## 🐳 Docker Setup (Qdrant & Redis)
+##  Docker Setup (Qdrant & Redis)
 
 This project requires **Qdrant** (for vector storage) and **Redis** (for session management). Run both services using Docker.
 
-- ### 📦 Start Qdrant
+- ###  Start Qdrant
 
 ```bash
 docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
 ```
 
-- ### 📦 Start Redis
+- ###  Start Redis
 ```bash
 docker run -p 6379:6379 redis
 ```
 
 
-## 📡 API Endpoints
+##  API Endpoints
 
 | Method | Endpoint                                | Description                                           |
 |--------|-----------------------------------------|-------------------------------------------------------|
